@@ -1,10 +1,12 @@
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace solobranch.ggj2025
 {
-    public class PlayerController : MonoBehaviour
+    public class Player : MonoBehaviour
     {
         [Header("Movement Settings")] public float movementSpeed = 5f;
         private float sprintSpeed = 8.5f;
@@ -22,10 +24,12 @@ namespace solobranch.ggj2025
         public float maxStamina;
         public float staminaRegainRate;
         public float staminaDepletionRate;
+        
+        [Header("Interact Settings")] public float interactDistance = 10f;
+        public TMP_Text scoreText;
+        
         private float currentStamina;
         private bool canSprint => currentStamina > 0;
-
-
         private float groundCheckRadius = 0.4f;
         private Vector2 moveInput = Vector2.zero;
         private Vector2 lookInput = Vector2.zero;
@@ -34,6 +38,7 @@ namespace solobranch.ggj2025
         private bool jumpPressed;
         private bool isSprinting;
 
+        private List<Pickup> inventory = new();
 
         private void Start()
         {
@@ -94,7 +99,6 @@ namespace solobranch.ggj2025
             velocity.y = capsuleRigidbody.linearVelocity.y;
 
             capsuleRigidbody.linearVelocity = velocity;
-            Debug.Log("Velocity: " + capsuleRigidbody.linearVelocity.magnitude);
         }
 
         private void HandleLook()
@@ -117,6 +121,15 @@ namespace solobranch.ggj2025
             }
 
             jumpPressed = false;
+        }
+
+        public void AddToInventory(Pickup pickup)
+        {
+            inventory.Add(pickup);
+            
+            // update UI
+            int score = inventory.Count;
+            scoreText.SetText($"{score}/10");
         }
 
         private void CheckGround()
@@ -155,6 +168,20 @@ namespace solobranch.ggj2025
             else if (ctx.canceled)
             {
                 isSprinting = false;
+            }
+        }
+
+        public void OnInteract(InputAction.CallbackContext ctx)
+        {
+            Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+            Physics.Raycast(ray, out RaycastHit hit, interactDistance, LayerMask.GetMask("Interactable"));
+
+            if (hit.collider != null)
+            {
+                if (hit.collider.TryGetComponent(out Pickup pickup))
+                {
+                    pickup.PickUp(this);
+                }
             }
         }
 
