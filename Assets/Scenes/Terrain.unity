@@ -14,8 +14,8 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.035777852, g: 0.2830189, b: 0.25694716, a: 1}
   m_FogMode: 3
   m_FogDensity: 0.01
   m_LinearFogStart: 0
@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 19c7554d6dd837245baf680989261168, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2368420125561078617, guid: 9df8d3fed7a80624c92398119e02e189, type: 3}
+      propertyPath: staminaBar
+      value: 
+      objectReference: {fileID: 1200235790}
     - target: {fileID: 5659198159468053972, guid: 9df8d3fed7a80624c92398119e02e189, type: 3}
       propertyPath: m_LocalPosition.x
       value: 462.5
@@ -1128,7 +1132,7 @@ GameObject:
   - component: {fileID: 316563303}
   - component: {fileID: 316563302}
   - component: {fileID: 316563301}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2479,7 +2483,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 1
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Color: {r: 0.15076533, g: 0.37219128, b: 0.4566037, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
