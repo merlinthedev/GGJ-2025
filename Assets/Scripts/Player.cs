@@ -59,8 +59,11 @@ namespace solobranch.ggj2025
 
         private void OnDestroy()
         {
+            // cleanup
             OnPlayerDamage.RemoveAllListeners();
             OnBubblePickUp.RemoveAllListeners();
+            OnBushEnter.RemoveAllListeners();
+            OnBushExit.RemoveAllListeners();
         }
 
         private void FixedUpdate()
@@ -210,6 +213,11 @@ namespace solobranch.ggj2025
             }
         }
 
+        private void Die()
+        {
+            // TODO: Toggle game over screen
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             Bush bush = other.gameObject.GetComponent<Bush>();
@@ -217,6 +225,12 @@ namespace solobranch.ggj2025
             if (bush != null)
             {
                 AddToBushList(bush);
+            }
+
+            if (other.gameObject.CompareTag("Water"))
+            {
+                // die
+                Die();
             }
         }
 
@@ -235,9 +249,9 @@ namespace solobranch.ggj2025
             if (!currentlyInBushes.Contains(bush))
             {
                 currentlyInBushes.Add(bush);
-                
+
                 // do something
-                if(currentlyInBushes.Count == 1)
+                if (currentlyInBushes.Count == 1)
                 {
                     // entered a bush
                     OnBushEnter?.Invoke();
@@ -250,8 +264,8 @@ namespace solobranch.ggj2025
             if (currentlyInBushes.Contains(bush))
             {
                 currentlyInBushes.Remove(bush);
-                
-                if(currentlyInBushes.Count == 0)
+
+                if (currentlyInBushes.Count == 0)
                 {
                     // no longer in any bushes
                     // do something

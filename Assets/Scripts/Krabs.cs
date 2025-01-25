@@ -23,6 +23,9 @@ namespace solobranch.ggj2025
         private bool persistentTarget = false;
         public bool isPlayerHidden = false;
 
+        public Vector3 targetPosition;
+        public Vector3 currentPosition;
+
 
         private void Awake()
         {
@@ -49,6 +52,9 @@ namespace solobranch.ggj2025
 
         private void Update()
         {
+            targetPosition = agent.destination;
+            currentPosition = transform.position;
+
             if (persistentTarget)
             {
                 agent.SetDestination(Player.StaticTransform.position);
@@ -56,6 +62,7 @@ namespace solobranch.ggj2025
 
             if (agent.remainingDistance <= agent.stoppingDistance)
             {
+                Debug.Log("Destination reached, going to idle...");
                 ChangeState(KRAB_STATE.IDLE);
             }
         }
@@ -90,7 +97,8 @@ namespace solobranch.ggj2025
                 case KRAB_STATE.BUBBLE_CHASING:
                     animator.SetBool(isWalkingHash, true);
                     agent.speed = GetBubbleChaseSpeed();
-                    agent.SetDestination(targetBubble.transform.position);
+                    agent.SetDestination(new Vector3(targetBubble.transform.position.x,
+                        targetBubble.transform.position.y, targetBubble.transform.position.z));
                     break;
 
                 case KRAB_STATE.ENRAGED:
@@ -111,6 +119,7 @@ namespace solobranch.ggj2025
             isPlayerHidden = true;
             if (state == KRAB_STATE.ENRAGED)
             {
+                persistentTarget = false;
                 ChangeState(KRAB_STATE.IDLE);
             }
         }
@@ -118,6 +127,13 @@ namespace solobranch.ggj2025
         private void HandlePlayerBushExit()
         {
             isPlayerHidden = false;
+            
+            // disable and enable colliders in child components so we reset the trigger methods
+            foreach (Collider collider in GetComponentsInChildren<Collider>())
+            {
+                collider.enabled = false;
+                collider.enabled = true;
+            }
         }
 
         private void HandleKrabsColliderEnter()

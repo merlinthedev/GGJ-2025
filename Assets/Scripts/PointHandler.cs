@@ -23,6 +23,7 @@ namespace solobranch.ggj2025
         public Vector3 GetRandomPoint()
         {
             int randomIndex = UnityEngine.Random.Range(0, points.Count);
+            Debug.Log("returning point with index " + randomIndex);
             return points[randomIndex].position;
         }
     }
