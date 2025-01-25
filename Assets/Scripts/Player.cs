@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -42,11 +43,18 @@ namespace solobranch.ggj2025
         private List<Pickup> inventory = new();
 
         public static UnityEvent<int> OnPlayerDamage = new();
+        public static UnityEvent<int> OnBubblePickUp = new();
 
         private void Start()
         {
             UpdateScoreUI();
             Cursor.lockState = CursorLockMode.Locked;
+        }
+
+        private void OnDestroy()
+        {
+            OnPlayerDamage.RemoveAllListeners();
+            OnBubblePickUp.RemoveAllListeners();
         }
 
         private void FixedUpdate()
