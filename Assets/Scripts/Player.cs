@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -24,10 +25,10 @@ namespace solobranch.ggj2025
         public float maxStamina;
         public float staminaRegainRate;
         public float staminaDepletionRate;
-        
+
         [Header("Interact Settings")] public float interactDistance = 10f;
         public TMP_Text scoreText;
-        
+
         private float currentStamina;
         private bool canSprint => currentStamina > 0;
         private float groundCheckRadius = 0.4f;
@@ -40,8 +41,11 @@ namespace solobranch.ggj2025
 
         private List<Pickup> inventory = new();
 
+        public static UnityEvent<int> OnPlayerDamage = new();
+
         private void Start()
         {
+            UpdateScoreUI();
             Cursor.lockState = CursorLockMode.Locked;
         }
 
@@ -126,10 +130,15 @@ namespace solobranch.ggj2025
         public void AddToInventory(Pickup pickup)
         {
             inventory.Add(pickup);
-            
+
             // update UI
+            UpdateScoreUI();
+        }
+
+        private void UpdateScoreUI()
+        {
             int score = inventory.Count;
-            scoreText.SetText($"{score}/10");
+            scoreText.SetText($"{score}/{PickupManager.AmountOfPickups}");
         }
 
         private void CheckGround()
