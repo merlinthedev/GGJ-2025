@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using EasyButtons;
 
 namespace solobranch.ggj2025
 {
@@ -36,6 +37,16 @@ namespace solobranch.ggj2025
                 {
                     Instantiate(pickupPrefab, position, Quaternion.identity);
                 }
+            }
+        }
+        
+        [Button]
+        public void SpawnPrimitivesAtSpawnPoints()
+        {
+            foreach (var point in spawnPoints)
+            {
+                GameObject primitive = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                primitive.transform.position = point;
             }
         }
     }

@@ -21,22 +21,24 @@ namespace solobranch.ggj2025
         private Pickup targetBubble;
 
         private bool persistentTarget = false;
+        public bool isPlayerHidden = false;
 
 
         private void Awake()
         {
             Player.OnBubblePickUp.AddListener(HandlePlayerBubblePickUp);
+            Player.OnBushEnter.AddListener(HandlePlayerBushEnter);
+            Player.OnBushExit.AddListener(HandlePlayerBushExit);
+            KrabsCollider.OnKrabsColliderEntered.AddListener(HandleKrabsColliderEnter);
         }
 
         private void Start()
         {
-            state = KRAB_STATE.IDLE;
             isWalkingHash = Animator.StringToHash("isWalking");
 
-            animator.SetBool(isWalkingHash, state != KRAB_STATE.IDLE);
+            animator.SetBool(isWalkingHash, false);
 
-            agent.SetDestination(PointHandler.Instance.GetRandomPoint());
-            ChangeState(KRAB_STATE.WALKING);
+            ChangeState(KRAB_STATE.IDLE);
         }
 
         private void HandlePlayerBubblePickUp(Pickup pickup)
@@ -55,55 +57,74 @@ namespace solobranch.ggj2025
             if (agent.remainingDistance <= agent.stoppingDistance)
             {
                 ChangeState(KRAB_STATE.IDLE);
-                StartCoroutineInRandomInterval();
             }
-        }
-
-        private void StartCoroutineInRandomInterval()
-        {
-            // wait between 0.1 and 1.2 seconds before starting the coroutine
-            float randomWaitTime = UnityEngine.Random.Range(0.1f, 1.2f);
-            StartCoroutine(StartWait(randomWaitTime));
-        }
-
-        private IEnumerator StartWait(float time)
-        {
-            yield return new WaitForSeconds(time);
-            agent.SetDestination(PointHandler.Instance.GetRandomPoint());
-            ChangeState(KRAB_STATE.WALKING);
         }
 
         private void ChangeState(KRAB_STATE newState)
         {
-            previousState = state;
-            state = newState;
-            if (previousState == KRAB_STATE.ENRAGED && state != KRAB_STATE.ENRAGED)
+            // Special case: If currently enraged, allow transition only to WALKING if the player is hidden.
+            if (state == KRAB_STATE.ENRAGED && !isPlayerHidden && newState != KRAB_STATE.WALKING)
             {
-                persistentTarget = false;
+                Debug.Log($"Ignoring transition from ENRAGED to {newState} while player is visible.");
+                return;
             }
 
+            // Update previous state and set new state
+            previousState = state;
+            state = newState;
+
+            // Handle state-specific logic
             switch (state)
             {
                 case KRAB_STATE.IDLE:
                     animator.SetBool(isWalkingHash, false);
+                    agent.SetDestination(PointHandler.Instance.GetRandomPoint());
+                    ChangeState(KRAB_STATE.WALKING);
                     break;
+
                 case KRAB_STATE.WALKING:
                     animator.SetBool(isWalkingHash, true);
                     agent.speed = speed;
                     break;
+
                 case KRAB_STATE.BUBBLE_CHASING:
                     animator.SetBool(isWalkingHash, true);
                     agent.speed = GetBubbleChaseSpeed();
                     agent.SetDestination(targetBubble.transform.position);
                     break;
+
                 case KRAB_STATE.ENRAGED:
                     animator.SetBool(isWalkingHash, true);
                     agent.speed = enragedSpeed;
                     persistentTarget = true;
+                    agent.SetDestination(Player.StaticTransform.position); // Always target player
                     break;
+
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    Debug.LogError($"Unhandled state: {newState}");
+                    break;
             }
+        }
+
+        private void HandlePlayerBushEnter()
+        {
+            isPlayerHidden = true;
+            if (state == KRAB_STATE.ENRAGED)
+            {
+                ChangeState(KRAB_STATE.IDLE);
+            }
+        }
+
+        private void HandlePlayerBushExit()
+        {
+            isPlayerHidden = false;
+        }
+
+        private void HandleKrabsColliderEnter()
+        {
+            if (isPlayerHidden) return;
+
+            ChangeState(KRAB_STATE.ENRAGED);
         }
 
         private float GetBubbleChaseSpeed()

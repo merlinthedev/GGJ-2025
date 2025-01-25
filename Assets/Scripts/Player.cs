@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -44,7 +45,11 @@ namespace solobranch.ggj2025
 
         public static UnityEvent<int> OnPlayerDamage = new();
         public static UnityEvent<Pickup> OnBubblePickUp = new();
+        public static UnityEvent OnBushEnter = new(); // player is now hidden
+        public static UnityEvent OnBushExit = new(); // player is no longer hidden
         public static Transform StaticTransform { get; private set; }
+
+        private List<Bush> currentlyInBushes = new();
 
         private void Start()
         {
@@ -201,6 +206,56 @@ namespace solobranch.ggj2025
                 if (hit.collider.TryGetComponent(out Pickup pickup))
                 {
                     pickup.PickUp(this);
+                }
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            Bush bush = other.gameObject.GetComponent<Bush>();
+
+            if (bush != null)
+            {
+                AddToBushList(bush);
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            Bush bush = other.gameObject.GetComponent<Bush>();
+
+            if (bush != null)
+            {
+                RemoveFromBushList(bush);
+            }
+        }
+
+        private void AddToBushList(Bush bush)
+        {
+            if (!currentlyInBushes.Contains(bush))
+            {
+                currentlyInBushes.Add(bush);
+                
+                // do something
+                if(currentlyInBushes.Count == 1)
+                {
+                    // entered a bush
+                    OnBushEnter?.Invoke();
+                }
+            }
+        }
+
+        private void RemoveFromBushList(Bush bush)
+        {
+            if (currentlyInBushes.Contains(bush))
+            {
+                currentlyInBushes.Remove(bush);
+                
+                if(currentlyInBushes.Count == 0)
+                {
+                    // no longer in any bushes
+                    // do something
+                    OnBushExit?.Invoke();
                 }
             }
         }
