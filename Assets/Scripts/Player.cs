@@ -53,8 +53,6 @@ namespace solobranch.ggj2025
 
         public FootstepSFX footstepSFX;
 
-        public FootstepSFX footstepSFX;
-
         private void Start()
         {
             UpdateScoreUI();
