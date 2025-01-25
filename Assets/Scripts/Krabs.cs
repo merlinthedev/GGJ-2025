@@ -51,7 +51,7 @@ namespace solobranch.ggj2025
         private void HandlePlayerBubblePickUp(Pickup pickup)
         {
             targetBubble = pickup;
-            ChangeState(KRAB_STATE.BUBBLE_CHASING);
+            ChangeState(KRAB_STATE.ENRAGED);
         }
 
         private void Update()
@@ -98,19 +98,11 @@ namespace solobranch.ggj2025
                     agent.speed = speed;
                     break;
 
-                case KRAB_STATE.BUBBLE_CHASING:
-                    animator.SetBool(isWalkingHash, true);
-                    agent.speed = GetBubbleChaseSpeed();
-                    agent.SetDestination(new Vector3(targetBubble.transform.position.x,
-                        targetBubble.transform.position.y, targetBubble.transform.position.z));
-                    break;
-
                 case KRAB_STATE.ENRAGED:
                     animator.SetBool(isWalkingHash, true);
-                    agent.speed = enragedSpeed;
+                    agent.speed = GetBubbleChaseSpeed();
                     persistentTarget = true;
                     agent.SetDestination(Player.StaticTransform.position); // Always target player
-                    audioSource.Play();
                     break;
 
                 default:
@@ -145,6 +137,7 @@ namespace solobranch.ggj2025
         {
             if (isPlayerHidden) return;
 
+            audioSource.Play();
             ChangeState(KRAB_STATE.ENRAGED);
         }
 
@@ -168,7 +161,6 @@ namespace solobranch.ggj2025
     {
         IDLE,
         WALKING,
-        BUBBLE_CHASING,
         ENRAGED
     }
 }
