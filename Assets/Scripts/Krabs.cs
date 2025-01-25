@@ -22,6 +22,8 @@ namespace solobranch.ggj2025
 
         private bool persistentTarget = false;
         public bool isPlayerHidden = false;
+        
+        private AudioSource audioSource;
 
 
         private void Awake()
@@ -39,6 +41,8 @@ namespace solobranch.ggj2025
             animator.SetBool(isWalkingHash, false);
 
             ChangeState(KRAB_STATE.IDLE);
+            
+            audioSource = GetComponent<AudioSource>();
         }
 
         private void HandlePlayerBubblePickUp(Pickup pickup)
@@ -98,6 +102,7 @@ namespace solobranch.ggj2025
                     agent.speed = enragedSpeed;
                     persistentTarget = true;
                     agent.SetDestination(Player.StaticTransform.position); // Always target player
+                    audioSource.Play();
                     break;
 
                 default:
