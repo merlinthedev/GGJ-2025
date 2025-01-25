@@ -51,6 +51,8 @@ namespace solobranch.ggj2025
 
         private List<Bush> currentlyInBushes = new();
 
+        public FootstepSFX footstepSFX;
+
         private void Start()
         {
             UpdateScoreUI();
@@ -166,6 +168,15 @@ namespace solobranch.ggj2025
         public void OnMove(InputAction.CallbackContext context)
         {
             moveInput = context.ReadValue<Vector2>();
+            
+            if (moveInput.magnitude > 0.1f)
+            {
+                footstepSFX.PlayFootstepSound();
+            }
+            else
+            {
+                footstepSFX.PauseFootstepSound();
+            }
         }
 
         public void OnLook(InputAction.CallbackContext context)
