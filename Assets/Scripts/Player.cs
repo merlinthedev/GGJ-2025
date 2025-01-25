@@ -43,7 +43,8 @@ namespace solobranch.ggj2025
         private List<Pickup> inventory = new();
 
         public static UnityEvent<int> OnPlayerDamage = new();
-        public static UnityEvent<int> OnBubblePickUp = new();
+        public static UnityEvent<Pickup> OnBubblePickUp = new();
+        public static Transform StaticTransform { get; private set; }
 
         private void Start()
         {
@@ -73,6 +74,7 @@ namespace solobranch.ggj2025
         private void LateUpdate()
         {
             HandleLook();
+            StaticTransform = transform;
         }
 
         private void HandleStamina()
@@ -139,6 +141,7 @@ namespace solobranch.ggj2025
         {
             inventory.Add(pickup);
 
+            OnBubblePickUp?.Invoke(pickup);
             // update UI
             UpdateScoreUI();
         }
